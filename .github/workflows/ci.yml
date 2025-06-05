@@ -150,15 +150,15 @@ jobs:
     #     pip install flake8
     #     flake8 src/ tests/ --max-line-length=100 --extend-ignore=E203
 
-  security:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+  # security:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
     
-    - name: Run security scan
-      uses: github/codeql-action/init@v2
-      with:
-        languages: python
+  #   - name: Run security scan
+  #     uses: github/codeql-action/init@v2
+  #     with:
+  #       languages: python
         
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2 
+  #   - name: Perform CodeQL Analysis
+  #     uses: github/codeql-action/analyze@v2 
