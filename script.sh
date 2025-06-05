@@ -2,11 +2,13 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
+docker compose up -d
+
 # Initialize the database
 python src/init_db.py
 
 # Run the crawler (single fetch)
-python src/crawler.py --mode single --batch-size 100 --batch-threshold 900 --keywords kokkos
+python src/crawler.py --mode single --batch-size 100 --total-num-repo 100 --num-threads 2
 # Run the crawler (pipeline fetch)
 python src/crawler.py --mode pipeline --batch-size 100 --total-num-repo 100 --num-threads 2
 
@@ -35,6 +37,7 @@ docker-compose down -v
 # About the database
 # Method 1: Using connection string
 PGPASSWORD=postgres psql -h localhost -p 5432 -U edison -d star_crawler_edison
+PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d github_crawler_test
 # 1. List all tables: 
 \dt
 # 2. Describe a table: 

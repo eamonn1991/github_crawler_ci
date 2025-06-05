@@ -21,8 +21,7 @@ def get_db():
         db.close()
 
 def get_engine(fresh_settings=False):
-    """Get SQLAlchemy engine with optional fresh settings"""
-    settings = get_fresh_settings() if fresh_settings else get_settings()
+    """Get SQLAlchemy engine"""
     return create_engine(settings.database_url, echo=False)
 
 def get_session_maker(engine=None):
@@ -32,8 +31,8 @@ def get_session_maker(engine=None):
     return sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db(fresh_settings=False):
-    """Get a database session with optional fresh settings"""
-    engine = get_engine(fresh_settings)
+    """Get a database session"""
+    engine = get_engine()
     SessionLocal = get_session_maker(engine)
     db = SessionLocal()
     try:
@@ -41,10 +40,9 @@ def get_db(fresh_settings=False):
     finally:
         db.close()
 
-
-def create_tables(fresh_settings=False):
-    """Create all database tables with optional fresh settings"""
-    engine = get_engine(fresh_settings)
+def create_tables():
+    """Create all database tables"""
+    engine = get_engine()
     Base.metadata.create_all(bind=engine)
 
 class Repository(Base):
