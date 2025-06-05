@@ -43,6 +43,9 @@ jobs:
     - name: Set up environment
       run: |
         echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+        echo "Running in directory: $(pwd)"
+        echo "Workspace: ${{ github.workspace }}"
+        ls -la
         
     - name: Create test config
       run: |
@@ -103,12 +106,15 @@ jobs:
         EOL
         
     - name: Initialize database
-      run: python src/init_db.py
+      run: |
+        python -c "import sys; print(sys.path)"
+        python src/init_db.py
         
     - name: Run tests
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
+        python -c "import sys; print(sys.path)"
         python -m pytest tests/ -v
         
     - name: Test crawler (single mode)

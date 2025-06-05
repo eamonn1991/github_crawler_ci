@@ -1,10 +1,10 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from config import settings
+from src.config import settings
 import time
 import sys
 
-from models import create_tables
+from src.models import create_tables
 
 def wait_for_db(max_retries=5, retry_interval=2):
     """Wait for the PostgreSQL server to be ready"""

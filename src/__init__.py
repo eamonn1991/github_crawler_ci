@@ -1,3 +1,3 @@
 """
-GitHub Crawler CI package
+GitHub Repository Crawler Package
 """

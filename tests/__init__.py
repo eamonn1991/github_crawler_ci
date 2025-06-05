@@ -1,3 +1,3 @@
 """
-GitHub Repository Crawler Tests
+Test suite for GitHub Repository Crawler
 """ 
