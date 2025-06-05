@@ -58,7 +58,7 @@ class ThreadSafeCounter:
             self.value = value
 
 # Constants from Config
-GITHUB_API_URL = settings.github_api_url
+GITHUB_API_URL = settings.github_graphql_url
 BATCH_SIZE = settings.batch_size
 
 # Initialize token manager with the GitHub token
@@ -86,7 +86,7 @@ def send_crawl_request(query, variables=None):
         'variables': variables or {}
     }
     
-    print("Request headers:", headers)
+    print("Request headers:", {k: '***' if k == 'Authorization' else v for k, v in headers.items()})
     print("Request data:", json_data)
     
     return requests.post(GITHUB_API_URL, json=json_data, headers=headers)

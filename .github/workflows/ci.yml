@@ -102,6 +102,11 @@ jobs:
             def database_url(self) -> str:
                 return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
+            @property
+            def github_graphql_url(self) -> str:
+                """Ensure we're always using the GraphQL endpoint"""
+                return "https://api.github.com/graphql"
+
         @lru_cache()
         def get_settings():
             return Settings()
