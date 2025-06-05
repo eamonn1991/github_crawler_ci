@@ -587,8 +587,8 @@ def main():
     parser.add_argument('--partition-threshold', type=int, default=settings.default_partition_threshold,
                       help='Number of repos to fetch before changing date range (max 1000)')
     parser.add_argument('--total-num-repo', type=int, help='Override total number of repositories to fetch')
-    parser.add_argument('--num-threads', type=int, default=4,
-                      help='Number of threads to use for crawling (default: 4)')
+    parser.add_argument('--num-threads', type=int, default=2,
+                      help='Number of threads to use for crawling (default: 2)')
 
     args = parser.parse_args()
     

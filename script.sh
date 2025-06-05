@@ -1,3 +1,4 @@
+python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
@@ -7,7 +8,7 @@ python src/init_db.py
 # Run the crawler (single fetch)
 python src/crawler.py --mode single --batch-size 100 --batch-threshold 900 --keywords kokkos
 # Run the crawler (pipeline fetch)
-python src/crawler.py --mode pipeline --batch-size 100 --start-year 2025 --start-month 5 --batch-threshold 900 --sort-by stars
+python src/crawler.py --mode pipeline --batch-size 100 --total-num-repo 100 --num-threads 2
 
 # Read data
 python src/read_data.py

@@ -1,9 +1,24 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, UniqueConstraint, Text, CheckConstraint
+from sqlalchemy import (
+    create_engine, Column, Integer, String, DateTime, Boolean,
+    ForeignKey, Table, MetaData, Text, UniqueConstraint, CheckConstraint
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from config import get_settings, get_fresh_settings
+from config import settings
 
 Base = declarative_base()
+
+# Initialize database engine
+engine = create_engine(settings.database_url)
+Session = sessionmaker(bind=engine)
+
+def get_db():
+    """Get a new database session"""
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
 
 def get_engine(fresh_settings=False):
     """Get SQLAlchemy engine with optional fresh settings"""
