@@ -1,8 +1,9 @@
 from pydantic_settings import BaseSettings
-from pydantic import Field
+from pydantic import Field, ConfigDict
 from dotenv import load_dotenv
 from functools import lru_cache
 from typing import Optional
+import os
 
 def reload_env():
     """Reload environment variables from .env file"""
@@ -13,9 +14,13 @@ class Settings(BaseSettings):
     Application settings using Pydantic BaseSettings.
     Environment variables will be automatically loaded and type-converted.
     """
+    model_config = ConfigDict(extra='ignore')
+
     # GitHub Configuration
-    github_token: Optional[str] = Field(None, description="Single GitHub API token for authentication")
-    github_token_multi_thread: Optional[str] = Field(None, description="Comma-separated GitHub API tokens for multi-threading")
+    github_token: str = Field(
+        default=os.environ.get('GITHUB_TOKEN', ''),
+        description="GitHub API token for authentication"
+    )
     github_api_url: str = Field(
         default="https://api.github.com/graphql",
         description="GitHub GraphQL API endpoint"
@@ -24,8 +29,8 @@ class Settings(BaseSettings):
     # Database Configuration
     db_host: str = Field(default="localhost", description="Database host")
     db_port: int = Field(default=5432, description="Database port")
-    db_name: str = Field(default="star_crawler_edison", description="Database name")
-    db_user: str = Field(default="edison", description="Database user")
+    db_name: str = Field(default="github_crawler_test", description="Database name")
+    db_user: str = Field(default="postgres", description="Database user")
     db_password: str = Field(default="postgres", description="Database password")
 
     # Crawler Configuration
@@ -71,9 +76,10 @@ class Settings(BaseSettings):
         description="Number of repos to fetch before changing date range (max 1000)"
     )
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    @property
+    def database_url(self) -> str:
+        """Generate the database URL from components"""
+        return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
 @lru_cache()
 def get_settings():

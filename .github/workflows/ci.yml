@@ -42,35 +42,82 @@ jobs:
         
     - name: Create test config
       run: |
-        cat > config.py << EOL
-        class Settings:
-            database_url = "postgresql://postgres:postgres@localhost:5432/github_crawler_test"
-            github_api_url = "https://api.github.com/graphql"
-            github_token_multi_thread = ["${{ secrets.GITHUB_TOKEN }}"]
-            batch_size = 50
-            total_num_repo = 100
-            max_retries = 3
-            default_min_stars = 100
-            default_partition_threshold = 1000
-            default_start_year = 2024
-            default_start_month = 1
-        settings = Settings()
+        cat > src/config.py << EOL
+        from pydantic_settings import BaseSettings
+        from pydantic import Field, ConfigDict
+        from dotenv import load_dotenv
+        from functools import lru_cache
+        import os
+
+        def reload_env():
+            """Reload environment variables from .env file"""
+            load_dotenv(override=True)
+
+        class Settings(BaseSettings):
+            model_config = ConfigDict(extra='ignore')
+
+            # GitHub Configuration
+            github_token: str = Field(
+                default=os.environ.get('GITHUB_TOKEN', ''),
+                description="GitHub API token for authentication"
+            )
+            github_api_url: str = Field(
+                default="https://api.github.com/graphql",
+                description="GitHub GraphQL API endpoint"
+            )
+
+            # Database Configuration
+            db_host: str = Field(default="localhost", description="Database host")
+            db_port: int = Field(default=5432, description="Database port")
+            db_name: str = Field(default="github_crawler_test", description="Database name")
+            db_user: str = Field(default="postgres", description="Database user")
+            db_password: str = Field(default="postgres", description="Database password")
+
+            # Test-specific settings
+            batch_size: int = Field(default=5, ge=1, le=100)
+            max_retries: int = Field(default=3, ge=1)
+            total_num_repo: int = Field(default=100, ge=1)
+            default_min_stars: int = Field(default=100, ge=0)
+            default_start_year: int = Field(default=2024, ge=2008, le=2025)
+            default_start_month: int = Field(default=1, ge=1, le=12)
+            default_partition_threshold: int = Field(default=100, gt=0, le=1000)
+
+            @property
+            def database_url(self) -> str:
+                return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+
+        @lru_cache()
+        def get_settings():
+            return Settings()
+
+        def get_fresh_settings():
+            get_settings.cache_clear()
+            reload_env()
+            return get_settings()
+
+        settings = get_fresh_settings()
         EOL
         
     - name: Initialize database
-      run: python src/models.py
+      run: python src/init_db.py
         
     - name: Run tests
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         python -m pytest tests/ -v
         
     - name: Test crawler (single mode)
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         python src/crawler.py --mode single --min-stars 1000 --language python --batch-size 5
+        
+    - name: Test crawler (pipeline mode)
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        python src/crawler.py --mode pipeline --min-stars 1000 --language python --batch-size 5 --total-num-repo 10 --num-threads 2
         
     - name: Lint code
       run: |

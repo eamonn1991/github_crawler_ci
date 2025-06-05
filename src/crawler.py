@@ -26,20 +26,17 @@ logging.basicConfig(
 )
 
 class TokenManager:
-    def __init__(self, tokens):
-        """Initialize with a list of tokens"""
-        if isinstance(tokens, str):
-            self.tokens = tokens.split(',')
-        else:
-            self.tokens = tokens
-        self.current = 0
+    def __init__(self, token):
+        """Initialize with a single token or a list of tokens"""
+        self.tokens = [token] if isinstance(token, str) else token
+        self.current_index = 0
         self.lock = Lock()
         
     def get_token(self):
-        """Get next token in round-robin fashion"""
+        """Get the next token in a thread-safe manner"""
         with self.lock:
-            token = self.tokens[self.current]
-            self.current = (self.current + 1) % len(self.tokens)
+            token = self.tokens[self.current_index]
+            self.current_index = (self.current_index + 1) % len(self.tokens)
             return token
 
 class ThreadSafeCounter:
@@ -64,8 +61,8 @@ class ThreadSafeCounter:
 GITHUB_API_URL = settings.github_api_url
 BATCH_SIZE = settings.batch_size
 
-# Initialize token manager
-token_manager = TokenManager(settings.github_token_multi_thread or settings.github_token)
+# Initialize token manager with the GitHub token
+token_manager = TokenManager(settings.github_token)
 
 def check_total_repos(shared_counters, target_total):
     """Helper function to check if we've reached the target total"""
@@ -467,10 +464,10 @@ def crawl_pipeline(args, max_retries=None):
         if max_retries is None:
             max_retries = settings.max_retries
             
-        # Get number of tokens for threading
-        num_threads = len(token_manager.tokens)
+        # Set number of threads for parallel processing
+        num_threads = args.num_threads
         target_total = args.total_num_repo if args.total_num_repo else settings.total_num_repo
-        print(f"Starting multi-threaded crawl with {num_threads} tokens")
+        print(f"Starting multi-threaded crawl with {num_threads} threads (using GitHub token)")
         print(f"Target total repositories: {target_total}")
 
         # Initialize shared counters
@@ -590,6 +587,8 @@ def main():
     parser.add_argument('--partition-threshold', type=int, default=settings.default_partition_threshold,
                       help='Number of repos to fetch before changing date range (max 1000)')
     parser.add_argument('--total-num-repo', type=int, help='Override total number of repositories to fetch')
+    parser.add_argument('--num-threads', type=int, default=4,
+                      help='Number of threads to use for crawling (default: 4)')
 
     args = parser.parse_args()
     

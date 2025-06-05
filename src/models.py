@@ -8,8 +8,7 @@ Base = declarative_base()
 def get_engine(fresh_settings=False):
     """Get SQLAlchemy engine with optional fresh settings"""
     settings = get_fresh_settings() if fresh_settings else get_settings()
-    database_url = f"postgresql://{settings.db_user}:{settings.db_password}@localhost:{settings.db_port}/{settings.db_name}"
-    return create_engine(database_url, echo=False)
+    return create_engine(settings.database_url, echo=False)
 
 def get_session_maker(engine=None):
     """Get a session maker for the given engine or create a new one"""

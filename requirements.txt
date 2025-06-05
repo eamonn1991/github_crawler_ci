@@ -1,6 +1,7 @@
 # Database
 SQLAlchemy==2.0.27
 psycopg2-binary==2.9.9  # PostgreSQL adapter
+sqlalchemy-utils==0.41.1
 
 # Configuration
 pydantic>=2.0.0
