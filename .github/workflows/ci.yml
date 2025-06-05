@@ -99,27 +99,34 @@ jobs:
         EOL
         
     - name: Initialize database
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: python src/init_db.py
         
     - name: Run tests
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         python -m pytest tests/ -v
         
     - name: Test crawler (single mode)
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         python src/crawler.py --mode single --min-stars 1000 --language python --batch-size 5
         
     - name: Test crawler (pipeline mode)
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         python src/crawler.py --mode pipeline --min-stars 1000 --language python --batch-size 5 --total-num-repo 10 --num-threads 2
         
     - name: Lint code
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         pip install flake8
         flake8 src/ tests/ --max-line-length=100 --extend-ignore=E203
