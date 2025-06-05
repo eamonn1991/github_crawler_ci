@@ -10,9 +10,13 @@ permissions:
   contents: read
   packages: read
   repository-projects: read
+  actions: read
 
 jobs:
   test:
+    permissions:
+      contents: read
+      actions: read
     runs-on: ubuntu-latest
     
     services:
@@ -117,20 +121,23 @@ jobs:
         
     - name: Run tests
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         python -c "import sys; print(sys.path)"
         python -m pytest tests/ -v
         
     - name: Test crawler (single mode)
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
+        echo "Testing GitHub token and API access..."
+        curl -H "Authorization: Bearer ${{ github.token }}" https://api.github.com/graphql -d '{"query":"query { viewer { login }}"}'
+        echo "\nRunning crawler..."
         python src/crawler.py --mode single --min-stars 1000 --language python --batch-size 5
         
     - name: Test crawler (pipeline mode)
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         python src/crawler.py --mode pipeline --min-stars 1000 --language python --batch-size 5 --total-num-repo 10 --num-threads 2
         

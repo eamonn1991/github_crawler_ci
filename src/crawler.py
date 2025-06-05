@@ -72,8 +72,12 @@ def send_crawl_request(query, variables=None):
     """
     Creates a GraphQL request with proper headers and authentication
     """
+    token = token_manager.get_token()
+    print(f"Using API URL: {GITHUB_API_URL}")
+    print(f"Token (first 10 chars): {token[:10]}...")
+    
     headers = {
-        'Authorization': f'Bearer {token_manager.get_token()}',
+        'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json',
     }
     
@@ -81,6 +85,9 @@ def send_crawl_request(query, variables=None):
         'query': query,
         'variables': variables or {}
     }
+    
+    print("Request headers:", headers)
+    print("Request data:", json_data)
     
     return requests.post(GITHUB_API_URL, json=json_data, headers=headers)
 
