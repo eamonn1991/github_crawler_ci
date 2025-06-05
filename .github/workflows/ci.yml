@@ -138,13 +138,12 @@ jobs:
         echo "Testing GitHub token and API access..."
         curl -H "Authorization: Bearer ${{ github.token }}" https://api.github.com/graphql -d '{"query":"query { viewer { login }}"}'
         echo "\nRunning crawler..."
-        python src/crawler.py --mode single --min-stars 1000 --language python --batch-size 5
-        
+        python src/crawler.py --mode single --language python --batch-size 100 --total-num-repo 2000 --num-threads 2
     - name: Test crawler (pipeline mode)
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        python src/crawler.py --mode pipeline --min-stars 1000 --language python --batch-size 5 --total-num-repo 10 --num-threads 2
+        python src/crawler.py --mode pipeline --language python --batch-size 100 --total-num-repo 2000 --num-threads 2
         
     # - name: Lint code
     #   run: |
