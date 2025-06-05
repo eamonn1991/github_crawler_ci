@@ -40,6 +40,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
+    - name: Set up environment
+      run: |
+        echo "${{ github.workspace }}/src" >> $GITHUB_PATH
+        echo "PYTHONPATH=${{ github.workspace }}/src" >> $GITHUB_ENV
+        
     - name: Create test config
       run: |
         cat > src/config.py << EOL
