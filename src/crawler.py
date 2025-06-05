@@ -58,7 +58,7 @@ class ThreadSafeCounter:
             self.value = value
 
 # Constants from Config
-GITHUB_API_URL = settings.github_graphql_url
+GITHUB_API_URL = settings.github_api_url
 BATCH_SIZE = settings.batch_size
 
 # Initialize token manager with the GitHub token

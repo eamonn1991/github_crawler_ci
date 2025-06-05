@@ -5,9 +5,11 @@ pip install -r requirements.txt
 docker compose up -d
 
 # Initialize the database
+export PYTHONPATH=$PWD && python src/init_db.py
 python src/init_db.py
 
 # Run the crawler (single fetch)
+export PYTHONPATH=$PWD GITHUB_TOKEN=your_token_here && python src/crawler.py --mode single --language python --batch-size 100 --total-num-repo 2000 --num-threads 2
 python src/crawler.py --mode single --batch-size 100 --total-num-repo 100 --num-threads 2
 # Run the crawler (pipeline fetch)
 python src/crawler.py --mode pipeline --batch-size 100 --total-num-repo 100 --num-threads 2
