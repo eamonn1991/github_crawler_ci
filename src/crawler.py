@@ -11,8 +11,8 @@ from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
-from config import settings
-from models import Repository, get_db
+from src.config import settings
+from src.models import Repository, get_db
 
 # Disable logging from other libraries
 logging.getLogger('urllib3').setLevel(logging.WARNING)
