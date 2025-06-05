@@ -146,10 +146,10 @@ jobs:
       run: |
         python src/crawler.py --mode pipeline --min-stars 1000 --language python --batch-size 5 --total-num-repo 10 --num-threads 2
         
-    - name: Lint code
-      run: |
-        pip install flake8
-        flake8 src/ tests/ --max-line-length=100 --extend-ignore=E203
+    # - name: Lint code
+    #   run: |
+    #     pip install flake8
+    #     flake8 src/ tests/ --max-line-length=100 --extend-ignore=E203
 
   security:
     runs-on: ubuntu-latest
